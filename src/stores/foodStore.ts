@@ -20,8 +20,13 @@ export default class FoodStore {
 
     getFoodObservable = () => (this.store);
 
-    addFoods = (newFood: Food) => {
+    addFood = (newFood: Food) => {
         this.foods.push(newFood);
+        this.store.next(this.foods);
+    }
+
+    removeFood = () => {
+        this.foods.pop();
         this.store.next(this.foods);
     }
 }

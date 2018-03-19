@@ -1,6 +1,6 @@
 import * as React from 'react';
 import FoodStore, { Food } from './stores/foodStore';
-import FoodFormStore from './stores/foodFormStore';
+import FoodFormStore, { FoodForm } from './stores/foodFormStore';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 
 interface IState {
@@ -18,22 +18,35 @@ export default class RxComponent extends React.Component<{}, IState> {
 
     constructor(props: {}) {
         super(props);
+        this.subscribeState();
     }
 
-    componentDidMount() {
-        this.subscribeObservables();
+    subscribeState = () => {
+        combineLatest(
+            this.foodObservable,
+            this.foodFormObservable,
+            (foods, foodForm) => ({foods: foods, foodForm: foodForm})
+        ).subscribe((combined) => {
+            this.state ? this.updateState(combined) : this.setInitialState(combined);
+        });
     }
 
-    subscribeObservables = () => {
-        combineLatest(this.foodObservable, this.foodFormObservable, (foods, foodForm) => ({foods: foods, foodForm: foodForm}))
-            .subscribe((combined) => {
-                this.setState({
-                    foods: combined.foods,
-                    foodName: combined.foodForm.getName(),
-                    foodPrice: combined.foodForm.getPrice(),
-                    foodImage: combined.foodForm.getImage()
-                });
-            });
+    setInitialState = (combined: {foods: Food[], foodForm: FoodForm}) => {
+        this.state = {
+            foods: combined.foods,
+            foodName: combined.foodForm.getName(),
+            foodPrice: combined.foodForm.getPrice(),
+            foodImage: combined.foodForm.getImage()
+        };
+    }
+
+    updateState = (combined: {foods: Food[], foodForm: FoodForm}) => {
+        this.setState({
+            foods: combined.foods,
+            foodName: combined.foodForm.getName(),
+            foodPrice: combined.foodForm.getPrice(),
+            foodImage: combined.foodForm.getImage()
+        });
     }
 
     renderLoading = () => (<span>Loading...</span>);
@@ -70,7 +83,10 @@ export default class RxComponent extends React.Component<{}, IState> {
                 value={this.state.foodImage}
                 onChange={(e) => {this.foodFormStore.mutateFoodForm(this.state.foodName, this.state.foodPrice, e.currentTarget.value); }}
             />
-            <button onClick={() => {this.foodStore.addFoods(new Food(this.state.foodName, this.state.foodPrice, this.state.foodImage)); }}>
+            <button onClick={() => {this.foodStore.addFood(new Food(this.state.foodName, this.state.foodPrice, this.state.foodImage)); }}>
+                Add Food
+            </button>
+            <button onClick={() => {this.foodStore.removeFood(); }}>
                 Add Food
             </button>
             <ul>
