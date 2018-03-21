@@ -14,7 +14,7 @@ export default class FoodFormStore {
         new FoodForm(
             'katsudon',
             6,
-            'https://cdn.pixabay.com/photo/2015/10/24/13/25/japanese-1004450_1280.jpg')
+            'images/katsudon.jpg')
     );
     getObservable = () => ( this.observable );
 

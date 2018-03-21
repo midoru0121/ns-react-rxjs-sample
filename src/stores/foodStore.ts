@@ -15,18 +15,17 @@ const initialFoods = [
 ];
 
 export default class FoodStore {
-    private foods: Array<Food> = initialFoods;
-    private store: BehaviorSubject<Array<Food>> = new BehaviorSubject(this.foods);
+    private store: BehaviorSubject<Array<Food>> = new BehaviorSubject(initialFoods);
 
     getFoodObservable = () => (this.store);
 
     addFood = (newFood: Food) => {
-        this.foods.push(newFood);
-        this.store.next(this.foods);
+        const currentFoods = this.store.getValue();
+        this.store.next(currentFoods.concat(newFood));
     }
 
     removeFood = () => {
-        this.foods.pop();
-        this.store.next(this.foods);
+        const currentFoods = this.store.getValue();
+        this.store.next(currentFoods.slice(0, currentFoods.length - 1));
     }
 }

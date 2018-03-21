@@ -21,6 +21,10 @@ export default class RxComponent extends React.Component<{}, IState> {
         this.subscribeState();
     }
 
+    setState(newState: IState) {
+        super.setState(newState);
+    }
+
     subscribeState = () => {
         combineLatest(
             this.foodObservable,
@@ -32,22 +36,21 @@ export default class RxComponent extends React.Component<{}, IState> {
     }
 
     setInitialState = (combined: {foods: Food[], foodForm: FoodForm}) => {
-        this.state = {
-            foods: combined.foods,
-            foodName: combined.foodForm.getName(),
-            foodPrice: combined.foodForm.getPrice(),
-            foodImage: combined.foodForm.getImage()
-        };
+        this.state = this.buildStateVal(combined);
     }
 
     updateState = (combined: {foods: Food[], foodForm: FoodForm}) => {
-        this.setState({
+        this.setState(this.buildStateVal(combined));
+    }
+
+    buildStateVal = (combined: {foods: Food[], foodForm: FoodForm}) => (
+        {
             foods: combined.foods,
             foodName: combined.foodForm.getName(),
             foodPrice: combined.foodForm.getPrice(),
             foodImage: combined.foodForm.getImage()
-        });
-    }
+        }
+    )
 
     renderLoading = () => (<span>Loading...</span>);
 
@@ -87,7 +90,7 @@ export default class RxComponent extends React.Component<{}, IState> {
                 Add Food
             </button>
             <button onClick={() => {this.foodStore.removeFood(); }}>
-                Add Food
+                Remove Food
             </button>
             <ul>
                 {this.renderFoodList(this.state.foods)}
